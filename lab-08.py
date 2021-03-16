@@ -110,13 +110,13 @@ class WireframeViewer(wf.WireframeGroup):
                         m_spec = np.array([0.5, 0.5, 0.5])
                         m_gls = 4.0
 
-                        c_diff = m_diff * self.light_color * max(np.dot(normal, self.light_vector), 0)
-                        diff = self.light_color * (c_diff * colour)
+                        # c_diff = np.clip(m_diff * self.light_color * colour * max(np.dot(normal, self.light_vector), 0), 0, 255)
+                        c_diff = m_diff * self.light_color * colour * max(np.dot(normal, self.light_vector), 0)
                         # print("c_diff =", np.round(c_diff, 2))
 
                         reflection_vector = 2 * np.dot(self.light_vector, normal) * normal - self.light_vector
-                        c_spec = m_spec * self.light_color * np.power(max(np.dot(self.view_vector, reflection_vector), 0), m_gls)
-                        spec = self.light_color * (c_spec * colour)
+                        # c_spec = np.clip(m_spec * self.light_color * colour * np.power(max(np.dot(self.view_vector, reflection_vector), 0), m_gls), 0, 255)
+                        c_spec = m_spec * self.light_color * colour * np.power(max(np.dot(self.view_vector, reflection_vector), 0), m_gls)
                         # print("c_spec =", np.round(c_spec, 2))
 
                         # c_amb = s_amb * m_amb
@@ -124,7 +124,7 @@ class WireframeViewer(wf.WireframeGroup):
 
 
                         #Once you have implemented diffuse and specular lighting, you will want to include them here
-                        c_total = np.clip(diff + ambient + spec, 0, 255)
+                        c_total = np.clip(c_diff + ambient + c_spec, 0, 255)
                         print("c_total =", np.round(c_total, 2))
                         light_total = c_total
 
