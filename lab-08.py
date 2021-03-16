@@ -105,7 +105,7 @@ class WireframeViewer(wf.WireframeGroup):
                         else:
                             c_diff = m_diff * colour * max(np.dot(normal, self.light_vector), 0)
 
-                            reflection_vector = 2 * np.dot(self.light_vector, normal) * normal - self.light_vector
+                            reflection_vector = 2 * max(np.dot(self.light_vector, normal), 0) * normal - self.light_vector
                             c_spec = m_spec * colour * np.power(max(np.dot(self.view_vector, reflection_vector), 0), m_gls)
 
                             light_total = np.clip(c_diff + ambient + c_spec, 0, 255)
