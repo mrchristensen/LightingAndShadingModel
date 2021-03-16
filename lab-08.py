@@ -28,7 +28,7 @@ class WireframeViewer(wf.WireframeGroup):
         self.perspective = False
         self.eyeX = self.width/2
         self.eyeY = 100
-        self.light_color = np.array([1,1,1])
+        self.light_color = np.array([1, 1, 1])
         self.view_vector = np.array([0, 0, -1])        
         self.light_vector = np.array([0, 0, -1])  
 
@@ -96,39 +96,30 @@ class WireframeViewer(wf.WireframeGroup):
                     if towards_us > 0:
                         m_ambient = 0.1
                         ambient = self.light_color * (m_ambient * colour)
-
-                        #Todo Your lighting code here
-                        #Make note of the self.view_vector and self.light_vector 
-                        #Use the Phong model
-
-                        # n = np.array([1., 1., -1.]) / np.sqrt(3)
-                        # l = np.array([2., 3., -1.]) / np.sqrt(14)
-                        # s = np.array([1., 1., 0.8]) * 0.9
-                        # s_amb = np.array([1., 1., 0.8]) * 0.1
-                        # v = np.array([0, 0, -1])
-                        m_diff = np.array([0.1, 0.2, 0.5])
-                        m_spec = np.array([0.5, 0.5, 0.5])
+                        m_diff = 0.45 * self.light_color
+                        m_spec = 0.45 * self.light_color
                         m_gls = 4.0
 
-                        # c_diff = np.clip(m_diff * self.light_color * colour * max(np.dot(normal, self.light_vector), 0), 0, 255)
-                        c_diff = m_diff * self.light_color * colour * max(np.dot(normal, self.light_vector), 0)
-                        # print("c_diff =", np.round(c_diff, 2))
+                        if np.dot(normal, self.light_vector) < 0:  # If the normal vector dotted with the light vector gives a negative value, the polygon is in shadow and should only have ambient light
+                            pygame.draw.polygon(self.screen, ambient, [(nodes[node][0], nodes[node][1]) for node in face], 0)
+                        else:
+                            c_diff = m_diff * colour * max(np.dot(normal, self.light_vector), 0)
 
-                        reflection_vector = 2 * np.dot(self.light_vector, normal) * normal - self.light_vector
-                        # c_spec = np.clip(m_spec * self.light_color * colour * np.power(max(np.dot(self.view_vector, reflection_vector), 0), m_gls), 0, 255)
-                        c_spec = m_spec * self.light_color * colour * np.power(max(np.dot(self.view_vector, reflection_vector), 0), m_gls)
-                        # print("c_spec =", np.round(c_spec, 2))
+                            reflection_vector = 2 * np.dot(self.light_vector, normal) * normal - self.light_vector
+                            # c_spec = np.clip(m_spec * self.light_color * colour * np.power(max(np.dot(self.view_vector, reflection_vector), 0), m_gls), 0, 255)
+                            c_spec = m_spec * colour * np.power(max(np.dot(self.view_vector, reflection_vector), 0), m_gls)
+                            # print("c_spec =", np.round(c_spec, 2))
 
-                        # c_amb = s_amb * m_amb
-                        # print("c_amb =", np.round(c_amb, 2))
+                            # c_amb = s_amb * m_amb
+                            # print("c_amb =", np.round(c_amb, 2))
 
 
-                        #Once you have implemented diffuse and specular lighting, you will want to include them here
-                        c_total = np.clip(c_diff + ambient + c_spec, 0, 255)
-                        print("c_total =", np.round(c_total, 2))
-                        light_total = c_total
+                            #Once you have implemented diffuse and specular lighting, you will want to include them here
+                            c_total = np.clip(c_diff + ambient + c_spec, 0, 255)
+                            print("c_total =", np.round(c_total, 2))
+                            light_total = c_total
 
-                        pygame.draw.polygon(self.screen, light_total, [(nodes[node][0], nodes[node][1]) for node in face], 0)
+                            pygame.draw.polygon(self.screen, light_total, [(nodes[node][0], nodes[node][1]) for node in face], 0)
 
                 if self.displayEdges:
                     for (n1, n2) in wireframe.edges:
