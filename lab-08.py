@@ -37,6 +37,35 @@ class WireframeViewer(wf.WireframeGroup):
         self.nodeRadius = 4
         
         self.control = 0
+
+    def rotation_matrix(self, x, y, z):
+
+        if x != 0:
+            rad = np.radians(x)
+            return np.array([
+                [1, 0, 0, 0],
+                [0, np.cos(rad), -np.sin(rad), 0],
+                [0, np.sin(rad), np.cos(rad), 0],
+                [0, 0, 0, 1]
+            ])
+        elif y != 0:
+            rad = np.radians(y)
+            return np.array([
+                [np.cos(rad), 0, np.sin(rad), 0],
+                [0, 1, 0, 0],
+                [-np.sin(rad), 0, np.cos(rad), 0],
+                [0, 0, 0, 1]
+            ])
+        elif z != 0:
+            rad = np.radians(z)
+            return np.array([
+                [np.cos(rad), -np.sin(rad), 0, 0],
+                [np.sin(rad), np.cos(rad), 0, 0],
+                [0, 0, 1, 0],
+                [0, 0, 0, 1]
+            ])
+
+        return "error"
     
     def addWireframe(self, name, wireframe):
         self.wireframes[name] = wireframe
@@ -112,19 +141,31 @@ class WireframeViewer(wf.WireframeGroup):
 
     def keyEvent(self, key):
         
-        #Your code here
-        if key == pygame.K_w:
+        #Todo: key press impl
+        homogeneous_light_vector = np.array([*self.light_vector, 1])
+        # print("light vector: ", self.light_vector)
+
+        # Pressing the a or d keys should cause a rotation about the Y axis
+        if key == pygame.K_a:  # move left
+            self.light_vector = np.matmul(self.rotation_matrix(0, 10., 0), homogeneous_light_vector)[:3]
+            print("a is pressed")
+        elif key == pygame.K_d:
+            self.light_vector = np.matmul(self.rotation_matrix(0, -10., 0), homogeneous_light_vector)[:3]
+            print("d is pressed")
+        # Pressing the w or s keys should cause a rotation about the X axis
+        elif key == pygame.K_w:  # Move forward
+            self.light_vector = np.matmul(self.rotation_matrix(-10, 0, 0), homogeneous_light_vector)[:3]
             print("w is pressed")
-
-
-
-
-
-
-
-
-
-
+        elif key == pygame.K_s:  # Move back
+            self.light_vector = np.matmul(self.rotation_matrix(10., 0, 0), homogeneous_light_vector)[:3]
+            print("s is pressed")
+        # Pressing the q or e keys should cause a rotation about the Z axis
+        elif key == pygame.K_q:
+            self.light_vector = np.matmul(self.rotation_matrix(0, 0, -10.), homogeneous_light_vector)[:3]
+            print("q is pressed")
+        elif key == pygame.K_e:
+            self.light_vector = np.matmul(self.rotation_matrix(0, 0, 10.), homogeneous_light_vector)[:3]
+            print("e is pressed")
 
         return
 
